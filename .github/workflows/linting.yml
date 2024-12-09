@@ -12,13 +12,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-      - run: |
-          composer install -q --no-ansi --no-interaction --no-progress
-          vendor/bin/phpcs --report=checkstyle | tee phpcs-report.xml
-      - uses: actions/upload-artifact@v3
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Run PHPCS
+        run: |
+          vendor/bin/phpcs --report=checkstyle | tee phpcs-report.xml || exit 1
+
+      - name: Store PHPCS Report
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
           name: phpcs-report
           path: phpcs-report.xml
