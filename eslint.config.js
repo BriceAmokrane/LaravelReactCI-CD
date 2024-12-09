@@ -15,21 +15,9 @@ export default [
                 version: "detect"
             }
         },
-        env: {
-            browser: true,
-            es2021: true
-        },
         rules: {
             "react/jsx-filename-extension": ["warn", { extensions: [".js", ".jsx"] }],
             "react/react-in-jsx-scope": "off"
         },
-        languageOptions: {
-            sourceType: "module",
-            parserOptions: {
-                ecmaFeatures: {
-                    jsx: true
-                }
-            }
-        }
     }
 ];
