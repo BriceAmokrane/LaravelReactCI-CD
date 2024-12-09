@@ -30,7 +30,7 @@ jobs:
 
       - name: Load Environment Variables
         run: |
-          php artisan key:generate -env=ci
+          php artisan key:generate --env=ci
           cp .env.ci .env
           cat .env.ci >> $GITHUB_ENV
       - name: Create SQLite File
