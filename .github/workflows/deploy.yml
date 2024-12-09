@@ -1,0 +1,108 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ main ]
+    types: [ closed ]
+
+jobs:
+  deploy:
+    name: Deploy to Heroku
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install PHP dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Install & Build Frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy to Production
+        if: github.ref == 'refs/heads/main'
+        uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "laravelreact-prod"
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          healthcheck: "https://prod.mokorp.fr/health"
+          rollbackonhealthcheckfailed: true
+        env:
+          HD_APP_NAME: ${{ secrets.PROD_APP_NAME }}
+          HD_APP_KEY: $(php artisan key:generate --show)
+          HD_APP_URL: ${{ secrets.PROD_APP_URL }}
+          HD_DB_CONNECTION: ${{ secrets.PROD_DB_CONNECTION }}
+          HD_REDIS_URL: ${{ secrets.PROD_REDIS_URL }}
+          HD_CACHE_DRIVER: "redis"
+          HD_QUEUE_CONNECTION: "redis"
+          HD_SESSION_DRIVER: "redis"
+
+      - name: Deploy to Staging
+        if: github.ref == 'refs/heads/develop'
+        uses: akhileshns/heroku-deploy@v3.13.15
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "laravelreact-staging"
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          healthcheck: "https://staging.mokorp.fr/health"
+          rollbackonhealthcheckfailed: true
+        env:
+          HD_APP_NAME: ${{ secrets.STAGING_APP_NAME }}
+          HD_APP_KEY: $(php artisan key:generate --show)
+          HD_APP_URL: ${{ secrets.STAGING_APP_URL }}
+          HD_DB_CONNECTION: ${{ secrets.STAGING_DB_CONNECTION }}
+          HD_REDIS_URL: ${{ secrets.STAGING_REDIS_URL }}
+          HD_CACHE_DRIVER: "redis"
+          HD_QUEUE_CONNECTION: "redis"
+          HD_SESSION_DRIVER: "redis"
+
+      - name: Scale Staging Workers
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku ps:scale --app laravelreact-staging \
+            web=2:Standard-1X
+          heroku ps:scale --app laravelreact-prod \
+            web=2:Standard-1X \
+
+      - name: Post-Deploy Prod Tasks
+        if: github.ref == 'refs/heads/main'
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku maintenance:on -a laravelreact-prod
+          heroku run php artisan migrate -a laravelreact-prod
+          heroku run php artisan db:seed -a laravelreact-prod
+          heroku run php artisan optimize -a laravelreact-prod
+          heroku run php artisan view:cache -a laravelreact-prod
+          heroku run php artisan config:cache -a laravelreact-prod
+          heroku run php artisan storage:link -a laravelreact-prod
+          heroku ps:scale worker-queue=2:Standard-1X -a laravelreact-prod
+          heroku maintenance:off -a laravelreact-prod
+
+      - name: Post-Deploy Staging Tasks
+        if: github.ref == 'refs/heads/develop'
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku maintenance:on -a laravelreact-staging
+          heroku run php artisan migrate -a laravelreact-staging
+          heroku run php artisan db:seed -a laravelreact-staging
+          heroku run php artisan optimize -a laravelreact-staging
+          heroku run php artisan view:cache -a laravelreact-staging
+          heroku run php artisan config:cache -a laravelreact-staging
+          heroku run php artisan storage:link -a laravelreact-staging
+          heroku ps:scale worker-queue=1:Standard-1X -a laravelreact-staging
+          heroku maintenance:off -a laravelreact-staging
+
+

@@ -1,0 +1,50 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  phpcs:
+    name: PHP CodeSniffer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - run: |
+          composer install -q --no-ansi --no-interaction --no-progress
+          vendor/bin/phpcs --report=checkstyle | tee phpcs-report.xml
+      - uses: actions/upload-artifact@v3
+        with:
+          name: phpcs-report
+          path: phpcs-report.xml
+
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: |
+          npm ci
+          npm run lint -- --format checkstyle > eslint-report.xml
+      - uses: actions/upload-artifact@v3
+        with:
+          name: eslint-report
+          path: eslint-report.xml
+
+  pint:
+    name: Laravel Pint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          composer install -q --no-ansi --no-interaction --no-progress
+          vendor/bin/pint --test

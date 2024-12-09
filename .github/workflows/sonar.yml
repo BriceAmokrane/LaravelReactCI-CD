@@ -1,0 +1,26 @@
+name: SonarCloud
+
+on:
+  workflow_run:
+    workflows: ["Tests", "Code Quality"]
+    types:
+      - completed
+
+jobs:
+  sonar:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download Reports
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: tests.yml
+          workflow_conclusion: success
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

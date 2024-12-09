@@ -1,0 +1,46 @@
+name: Tests
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  pest-tests:
+    name: Pest Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, curl, mbstring, zip, pdo, sqlite, pdo_sqlite
+          coverage: xdebug
+      - name: Prepare Laravel Application
+        run: |
+          cp .env.example .env
+          composer install -q --no-ansi --no-interaction --no-progress
+          php artisan key:generate
+
+      - name: Create SQLite Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Run Migrations
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: php artisan migrate:fresh
+
+      - name: Execute Tests
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: vendor/bin/pest --coverage-clover coverage.xml
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: test-coverage
+          path: coverage.xml
