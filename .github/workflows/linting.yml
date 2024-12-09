@@ -41,9 +41,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: |
+      - name: Install & Run ESLint
+        run: |
           npm ci
-          npm run lint -- --format checkstyle > eslint-report.xml
+          npm run lint -- -f checkstyle > eslint-report.xml
       - uses: actions/upload-artifact@v3
         with:
           name: eslint-report
@@ -54,6 +55,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+
       - run: |
           composer install -q --no-ansi --no-interaction --no-progress
           vendor/bin/pint --test
