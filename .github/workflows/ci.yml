@@ -52,6 +52,10 @@ jobs:
           name: pest-coverage
           path: coverage
 
+      - name: Display Laravel Logs
+        if: failure()
+        run: cat storage/logs/laravel.log
+
       - name: Run PHP CodeSniffer
         run: ./vendor/bin/phpcs --report-full=phpcs-report.txt app/
       - name: Upload PHP CodeSniffer Report
