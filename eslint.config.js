@@ -10,12 +10,18 @@ export default [
             "jsx-a11y": jsxA11y,
             "react-hooks": reactHooks
         },
-        extends: [react.configs.recommended],
+        settings: {
+            react: {
+                version: "detect"
+            }
+        },
+        ...react.configs.recommended[0],
         env: {
             browser: true,
             es2021: true
         },
         rules: {
+            ...react.configs.recommended[0].rules,
             "react/jsx-filename-extension": ["warn", { extensions: [".js", ".jsx"] }],
             "react/react-in-jsx-scope": "off"
         },

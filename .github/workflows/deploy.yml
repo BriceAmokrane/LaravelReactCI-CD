@@ -45,7 +45,7 @@ jobs:
           HD_APP_NAME: ${{ secrets.PROD_APP_NAME }}
           HD_APP_KEY: $(php artisan key:generate --show)
           HD_APP_URL: ${{ secrets.PROD_APP_URL }}
-          HD_DB_CONNECTION: ${{ secrets.PROD_DB_CONNECTION }}
+          HD_DATABASE_URL: ${{ secrets.PROD_DB_CONNECTION }}
           HD_REDIS_URL: ${{ secrets.PROD_REDIS_URL }}
           HD_CACHE_DRIVER: "redis"
           HD_QUEUE_CONNECTION: "redis"
@@ -64,7 +64,7 @@ jobs:
           HD_APP_NAME: ${{ secrets.STAGING_APP_NAME }}
           HD_APP_KEY: $(php artisan key:generate --show)
           HD_APP_URL: ${{ secrets.STAGING_APP_URL }}
-          HD_DB_CONNECTION: ${{ secrets.STAGING_DB_CONNECTION }}
+          HD_DATABASE_URL: ${{ secrets.STAGING_DB_CONNECTION }}
           HD_REDIS_URL: ${{ secrets.STAGING_REDIS_URL }}
           HD_CACHE_DRIVER: "redis"
           HD_QUEUE_CONNECTION: "redis"
