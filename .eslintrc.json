@@ -1,27 +1,16 @@
 {
+    "extends": ["plugin:react/recommended"],
+    "plugins": ["react", "jsx-a11y", "react-hooks"],
     "env": {
         "browser": true,
-        "node": true
-    },
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:prettier/recommended"
-    ],
-    "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module"
+        "es2021": true
     },
     "rules": {
-        "react/react-in-jsx-scope": "off",
-        "react/prop-types": "off",
-        "react/no-unescaped-entities": "off",
-        "no-undef": "off"
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+        "react/react-in-jsx-scope": "off"
     },
-    "settings": {
-        "react": {
-            "version": "detect"
-        }
+    "parserOptions": {
+        "sourceType": "module"
     }
 }
+

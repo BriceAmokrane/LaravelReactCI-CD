@@ -1,0 +1,67 @@
+name: Full CI for Laravel + React
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  ci:
+    name: Full CI
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1 : Vérifier le dépôt
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Étape 2 : Configurer PHP
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath
+
+      # Étape 3 : Installer les dépendances Laravel
+      - name: Install Laravel Dependencies
+        run: composer install --prefer-dist --no-progress
+
+      # Étape 4 : Installer les dépendances NPM
+      - name: Install NPM Dependencies
+        run: npm install
+
+      # Étape 5 : Lancer les tests Laravel avec Pest
+      - name: Run Pest Tests
+        run: ./vendor/bin/pest --coverage --coverage-cobertura=coverage
+      - name: Upload Laravel Coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: pest-coverage
+          path: coverage
+
+      # Étape 6 : Lancer PHP CodeSniffer
+      - name: Run PHP CodeSniffer
+        run: ./vendor/bin/phpcs --report-full=phpcs-report.txt app/
+      - name: Upload PHP CodeSniffer Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: phpcs-report
+          path: phpcs-report.txt
+
+      # Étape 7 : Lancer ESLint
+      - name: Run ESLint
+        run: npm run lint >> eslint-report.txt
+      - name: Upload ESLint Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: eslint-report
+          path: eslint-report.txt
+
+      # Étape 8 : Audit des dépendances
+      - name: Audit Dependencies
+        run: npm audit --production
