@@ -33,17 +33,6 @@ body:
       required: true
 
   - type: dropdown
-    id: milestone
-    attributes:
-      label: Milestone
-      options:
-        - "Milestone 1"
-        - "Milestone 2"
-        - "Milestone 3"
-    validations:
-      required: true
-
-  - type: dropdown
     id: priority
     attributes:
       label: Priorité
