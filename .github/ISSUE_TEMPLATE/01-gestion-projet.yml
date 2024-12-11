@@ -1,0 +1,146 @@
+name: Issue Gestion de Projet
+description: Template pour les tâches de gestion de projet
+title: "[GESTION] "
+labels: ["gestion-projet"]
+assignees: []
+body:
+  - type: dropdown
+    id: epic
+    attributes:
+      label: Epic
+      options:
+        - "Conception de la maquette"
+        - "Choix techniques"
+        - "Méthodologie projet"
+        - "Configuration GitHub"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task-type
+    attributes:
+      label: Type de tâche
+      options:
+        - "Rédaction document"
+        - "Organisation réunion"
+        - "Planification RDV"
+        - "Compte-rendu"
+        - "Maquette/Design"
+        - "Configuration technique"
+        - "Documentation"
+        - "Présentation"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      options:
+        - "Milestone 1"
+        - "Milestone 2"
+        - "Milestone 3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorité
+      options:
+        - "Critique (P0)"
+        - "Haute (P1)"
+        - "Moyenne (P2)"
+        - "Basse (P3)"
+    validations:
+      required: true
+
+  - type: input
+    id: start-date
+    attributes:
+      label: Date de début
+      description: "Date prévue de début de la tâche"
+      placeholder: "YYYY-MM-DD"
+    validations:
+      required: true
+
+  - type: input
+    id: end-date
+    attributes:
+      label: Date de fin
+      description: "Date prévue de fin de la tâche"
+      placeholder: "YYYY-MM-DD"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description détaillée
+      description: "Décrivez précisément la tâche à accomplir"
+      placeholder: |
+        - Contexte
+        - Objectifs
+        - Périmètre
+        - Contraintes particulières
+    validations:
+      required: true
+
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Livrables attendus
+      description: "Liste des livrables attendus pour cette tâche"
+      placeholder: |
+        - Support de présentation
+        - Compte-rendu
+        - Documentation
+        - Maquettes
+        - Configuration
+    validations:
+      required: true
+
+  - type: textarea
+    id: prerequisites
+    attributes:
+      label: Prérequis
+      description: "Liste des actions préalables nécessaires"
+      placeholder: |
+        - Préparation agenda
+        - Envoi invitations
+        - Préparation support
+        - Configuration requise
+
+  - type: dropdown
+    id: stakeholders
+    attributes:
+      label: Parties prenantes
+      multiple: true
+      options:
+        - "Cliente"
+        - "Tuteur"
+        - "Équipe"
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dépendances
+      description: "Liste des dépendances avec d'autres tâches"
+      placeholder: |
+        - Issue #123
+        - Validation préalable
+        - Configuration système
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: Critères de succès
+      description: "Critères de validation de la tâche"
+      placeholder: |
+        - Validation cliente
+        - Documentation complète
+        - Tests réussis
+    validations:
+      required: true
